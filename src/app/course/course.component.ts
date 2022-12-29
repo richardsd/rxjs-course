@@ -11,9 +11,9 @@ import {
     concatMap,
     switchMap,
     withLatestFrom,
-    concatAll, shareReplay
+    concatAll, shareReplay, throttle, throttleTime
 } from 'rxjs/operators';
-import {merge, fromEvent, Observable, concat} from 'rxjs';
+import {merge, fromEvent, Observable, concat, interval} from 'rxjs';
 import {Lesson} from '../model/lesson';
 import { createHttpObservable } from '../common/util';
 
@@ -48,17 +48,20 @@ export class CourseComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit() {
 
-        const initialLessons$ = this.loadLessons();
+        // const initialLessons$ = this.loadLessons();
 
-        const searchLessons$ = fromEvent<any>(this.input.nativeElement, 'keyup')
+        this.lessons$ = fromEvent<any>(this.input.nativeElement, 'keyup')
             .pipe(
                 map((event) => event.target.value),
+                // throttle(() => interval(500)),
+                // throttleTime(500),
+                startWith(''),
                 debounceTime(200),
                 distinctUntilChanged(), // ignore duplicate values (only accept distinct values)
                 switchMap((searchTerm) => this.loadLessons(searchTerm)),
             );
 
-        this.lessons$ = concat(initialLessons$, searchLessons$);
+        // this.lessons$ = concat(initialLessons$, searchLessons$);
 
     }
 
