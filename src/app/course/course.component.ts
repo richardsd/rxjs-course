@@ -16,6 +16,7 @@ import {
 import {merge, fromEvent, Observable, concat, interval} from 'rxjs';
 import {Lesson} from '../model/lesson';
 import { createHttpObservable } from '../common/util';
+import { RxJsLogginglevel, debug } from '../common/debug';
 
 
 @Component({
@@ -55,10 +56,12 @@ export class CourseComponent implements OnInit, AfterViewInit {
                 map((event) => event.target.value),
                 // throttle(() => interval(500)),
                 // throttleTime(500),
+                debug(RxJsLogginglevel.TRACE, 'message'),
                 startWith(''),
-                debounceTime(200),
+                debounceTime(400),
                 distinctUntilChanged(), // ignore duplicate values (only accept distinct values)
                 switchMap((searchTerm) => this.loadLessons(searchTerm)),
+                debug(RxJsLogginglevel.DEBUG, 'results'),
             );
 
         // this.lessons$ = concat(initialLessons$, searchLessons$);
